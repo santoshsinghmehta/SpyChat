@@ -2,13 +2,46 @@ from details import spy_salutation, spy_name, spy_age, spy_rating,spy_is_online
 print "hello Spy !!"
 print "let's get started"
 
+status_message = ["hello guys", "i'm busy","only call don't text me " "i'm busy"]
+
+def add_status(current_status_message):
+    updated_status = None
+    if current_status_message != None:
+        print "your current status message is " + current_status_message
+    else:
+        print "you don't have any current status message"
+    default = raw_input("do you want old status(y/n)")
+    if default.upper() == "N":
+        new_status = raw_input("what is your next status")
+        if len(new_status)>0:
+            updated_status = new_status
+            status_message.append(updated_status)
+    elif default.upper() == "Y":
+        status_position =1
+        for message in status_message:
+            print "%d %s " %(status_position,message)
+            status_position = status_position+1
+        message_select = int(raw_input("choose a message"))
+
+        if len(status_message)>= message_select:
+            updated_status = status_message[message_select-1]
+    else:
+        print "this is invalid option please try again"
+    if status_message:
+        print "your status message is :%s" % (updated_status)
+    else:
+        print "you did not update status"
+    return updated_status
+
+
+
 def start_chat(spy_name,spy_age, spy_rating,spy_is_online):
+    current_status_message = None
     menu_list = True
     while menu_list:
         menu_choice = input("What do you want to do? \n 1. Add a status update\n 0. Exit \n")
         if (menu_choice == 1):
-            status = raw_input("hello, %s write your status " % (spy_name))
-            print status
+            current_status_message = add_status(current_status_message)
         elif (menu_choice == 0):
             menu_list = False
         else:
