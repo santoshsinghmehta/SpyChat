@@ -4,6 +4,11 @@ print "let's get started"
 
 status_message = ["hello guys", "i'm busy","only call don't text me " "i'm busy"]
 
+friends_name = []
+friends_age = []
+friends_rating = []
+friends_is_online = []
+
 def add_status(current_status_message):
     updated_status = None
     if current_status_message != None:
@@ -33,15 +38,35 @@ def add_status(current_status_message):
         print "you did not update status"
     return updated_status
 
+def add_friend():
+    new_name = raw_input("Please add your friend's name:")
+    new_salutation = raw_input("Are they Mr. or Ms.?: ")
+    new_name = new_name + " " + new_salutation
+    new_age = input("Age?")
+    new_rating = input("Spy rating?")
+    if len(new_name) > 0 and new_age > 12 and new_rating >= spy_rating:
+        # Add Friend
+        friends_name.append(new_name)
+        friends_age.append(new_age)
+        friends_rating.append(new_rating)
+        friends_is_online.append(True)
+        print "friend added.."
+    else:
+        print 'Sorry! Invalid entry. We can\'t add spy with the details you provided'
+    return len(friends_name)
 
 
 def start_chat(spy_name,spy_age, spy_rating,spy_is_online):
     current_status_message = None
     menu_list = True
     while menu_list:
-        menu_choice = input("What do you want to do? \n 1. Add a status update\n 0. Exit \n")
+        menu_choice = input("What do you want to do? \n 1. Add a status update\n 2. Add a friend \n 0. Exit \n")
         if (menu_choice == 1):
             current_status_message = add_status(current_status_message)
+            print "your next status message is update" + current_status_message
+        elif (menu_choice == 2):
+            number_of_friend = add_friend()
+            print "you have %d friends" % (number_of_friend)
         elif (menu_choice == 0):
             menu_list = False
         else:
