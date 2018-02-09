@@ -1,4 +1,8 @@
 from details import spy
+from steganography.steganography import Steganography
+from datetime import datetime
+
+
 print "hello Spy !!"
 print "let's get started"
 
@@ -40,7 +44,8 @@ def add_friend():
         'name': '',
         'salutation': '',
         'age': 0,
-        'rating': 0.0
+        'rating': 0.0,
+        'chats': []
     }
     new_friend['name'] = raw_input("Please add your friend's name: ")
     new_friend['salutation'] = raw_input("Are they Mr. or Ms.?: ")
@@ -59,18 +64,62 @@ def add_friend():
 
     return len(friends)
 
+def select_friend():
+    serial_no = 1
+    for friend in friends:
+        print str(serial_no) + " " + friend["name"]
+        serial_no = serial_no + 1
+    select_user_friend = input("select your friend")
+    user_index = select_user_friend-1
+    return user_index
+
+
+def send_message():
+    user_selected_friend = select_friend()
+    original_image = raw_input("what is your image")
+    text = raw_input("what is secret message")
+    output_path =  "output.jpg"
+    Steganography.encode(original_image, output_path, text)
+    new_chat = {
+        "message": text,
+        "time": datetime.now(),
+        "sent_by_me": True
+    }
+    friends[user_selected_friend]['chats'].append(new_chat)
+    print "Your secret message is ready!"
+
+
+def read_message():
+    sender = select_friend()
+    output_path = raw_input("what is the name of file ")
+    secret_text = Steganography.decode(output_path)
+    print secret_text
+    new_chat = {
+        "message": secret_text,
+        "time": datetime.now(),
+        "sent_by_me": False
+    }
+
+    friends[sender]['chats'].append(new_chat)
+    print "Your secret message is" + secret_text
+
+
 
 def start_chat(spy_name,spy_age, spy_rating,spy_is_online):
     current_status_message = None
     menu_list = True
     while menu_list:
-        menu_choice = input("What do you want to do? \n 1. Add a status update\n 2. Add a friend \n 0. Exit \n")
+        menu_choice = input("What do you want to do? \n 1. Add a status update\n 2. Add a friend \n 3. Send a message \n 4. Read a message \n 0. Exit \n")
         if (menu_choice == 1):
             current_status_message = add_status(current_status_message)
             print "your next status message is update " + current_status_message
         elif (menu_choice == 2):
             number_of_friend = add_friend()
             print "you have %d friends" % (number_of_friend)
+        elif (menu_choice==3):
+            send_message()
+        elif (menu_choice == 4):
+            read_message()
         elif (menu_choice == 0):
             menu_list = False
         else:
