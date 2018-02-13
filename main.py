@@ -1,12 +1,31 @@
 from details import spy, Spy, ChatMessage, friends   #import details.py file to maintain spy details.
 from steganography.steganography import Steganography   #using steganography encoding and decoding the text with the help of images.
-from datetime import datetime   #import time.
+import csv  #importing csv file.
 
 
 print "hello Spy !!"
 print "let's get started"
 
 status_message = ["hello guys", "i'm busy","only call don't text me " "i'm busy"]   #predefine status messages.
+
+
+def load_friends():
+    with open('friends.csv', 'rb') as friends_data:
+        reader = csv.reader(friends_data)
+
+        for row in reader:
+            spy = Spy(name=row[0], salutation=row[1], rating=float(row[2]), age=int(row[3]))
+            friends.append(spy)
+
+
+def load_chat():
+    with open('chat.csv', 'rb') as chat_data:
+        reader = csv.reader(chat_data)
+
+        for row in reader:
+            spy = Spy(name=row[0], salutation=row[1], rating=float(row[2]), age=int(row[3]),chats = row[4])
+            friends.append(spy)
+
 
 
 
@@ -54,11 +73,16 @@ def add_friend():       #function create to adding friend with the help of dicti
 
     if len(new_friend.name) > 0 and new_friend.age > 12 and new_friend.rating >= spy.rating:
         friends.append(new_friend)
+        with open('friends.csv', 'a') as friends_data:
+            writer = csv.writer(friends_data)
+            writer.writerow([new_friend.name,new_friend.rating, new_friend.age, new_friend.is_online])
         print 'Friend Added!'
     else:
         print 'Sorry! Invalid entry. We can\'t add spy with the details you provided'
 
     return len(friends)
+
+
 
 def select_friend():        #function create to select a friend to friend list.
     serial_no = 1
@@ -78,6 +102,9 @@ def send_message():     #function create to send a message to friend.
     Steganography.encode(original_image, output_path, text)    #incoding the text message with the help of images.
 
     new_chat = ChatMessage(text, True)
+    with open('chat.csv', 'a') as chat_data:
+        writer = csv.writer(chat_data)
+        writer.writerow([spy.name , friends[user_selected_friend].name , new_chat.message])
     friends[user_selected_friend].chats.append(new_chat)     #append a new chat in status messages.
     print "Your secret message is ready! "
 
@@ -102,7 +129,7 @@ def start_chat(spy_name,spy_age, spy_rating,spy_is_online):     #function create
         menu_choice = input("What do you want to do? \n 1. Add a status update\n 2. Add a friend \n 3. Send a message \n 4. Read a message \n 0. Exit \n")
         if (menu_choice == 1):
             current_status_message = add_status(current_status_message)
-            print "your next status message is update " + current_status_message
+            print "your next status message is update:- " + current_status_message
         elif (menu_choice == 2):
             number_of_friend = add_friend()
             print "you have %d friends" % (number_of_friend)
