@@ -1,30 +1,23 @@
 from details import spy, Spy, ChatMessage, friends   #import details.py file to maintain spy details.
 from steganography.steganography import Steganography   #using steganography encoding and decoding the text with the help of images.
 import csv  #importing csv file.
+from termcolor import colored       #to using colorfull output.
 
 
-print "hello Spy !!"
-print "let's get started"
+print (colored("hello spy !!","green"))     #color is use in print function.
+print (colored("let's get started","green"))
 
 status_message = ["hello guys", "i'm busy","only call don't text me " "i'm busy"]   #predefine status messages.
-
+direct=['emergency','accedent','sos','help','save','save me']
 
 def load_friends():
     with open('friends.csv', 'rb') as friends_data:
         reader = csv.reader(friends_data)
 
         for row in reader:
-            spy = Spy(name=row[0], salutation=row[1], rating=float(row[2]), age=int(row[3]))
+            spy = Spy(name=row[0], rating=float(row[2]), age=int(row[3]))
             friends.append(spy)
 
-
-def load_chat():
-    with open('chat.csv', 'rb') as chat_data:
-        reader = csv.reader(chat_data)
-
-        for row in reader:
-            spy = Spy(name=row[0], salutation=row[1], rating=float(row[2]), age=int(row[3]),chats = row[4])
-            friends.append(spy)
 
 
 
@@ -104,29 +97,61 @@ def send_message():     #function create to send a message to friend.
     new_chat = ChatMessage(text, True)
     with open('chat.csv', 'a') as chat_data:
         writer = csv.writer(chat_data)
-        writer.writerow([spy.name , friends[user_selected_friend].name , new_chat.message])
+        writer.writerow([friends[user_selected_friend].name , new_chat.message])
     friends[user_selected_friend].chats.append(new_chat)     #append a new chat in status messages.
     print "Your secret message is ready! "
 
 
-def read_message():     #function create to read a message.
+def read_message():
     sender = select_friend()
-    output_path = raw_input("what is the name of file ")
-    secret_text = Steganography.decode(output_path)     #decoding the secret messages.
-    print secret_text
+    output_path = raw_input("What is the name of the file?")
+    try:
+        secret_text = Steganography.decode(output_path)
+    except TypeError:
+        print 'error'
+        exit()
+    if len(secret_text) == 0:
+        print "No secret mesage"
+    else:
+        temp = secret_text.split()
+        for i in direct:
+            if i in temp:
+                temp[temp.index(i)] = "help me"
+        secret_text = str.join(" ", temp)
+        if len(temp) > 100:
+            del friends[sender]
+            print 'Message length exceeded. Message was not saved.'
+            print 'Your friend is deleted'
+        else:
 
-    new_chat = ChatMessage(secret_text, False)
+            new_chat = ChatMessage(secret_text, False)
+            friends[sender].chats.append(new_chat)
+            print "Your secret message has been saved"
 
-    friends[sender].chats.append(new_chat)
-    print "Your secret message is " + secret_text
+def chat_history():         #function create for read a chat history
+    read_for = select_friend()
 
+    for chat in friends[read_for].chats:
+        if chat.sent_by_me:
+            # The date and time is printed in blue
+            print(colored(str(chat.time.strftime("%d %B %Y %A %H:%M")) + ",", 'blue')),
+            # The message is printed in red
+            print(colored("You said:", 'red')),
+            print str(chat.message)
+        else:
+            # The date and time is printed in blue
+            print(colored(str(chat.time.strftime("%d %B %Y %A %H:%M")) + ",", 'blue')),
+            # The message is printed in red
+            print(colored(str(friends[read_for].name) + " said:", 'red')),
+            # Black color is by default
+            print str(chat.message)
 
 
 def start_chat(spy_name,spy_age, spy_rating,spy_is_online):     #function create to chat start.
     current_status_message = None
     menu_list = True
     while menu_list:        #while loop is use to show the menu list
-        menu_choice = input("What do you want to do? \n 1. Add a status update\n 2. Add a friend \n 3. Send a message \n 4. Read a message \n 0. Exit \n")
+        menu_choice = input("What do you want to do? \n 1. Add a status update\n 2. Add a friend \n 3. Send a message \n 4. Read a message \n 5. Chat History \n 0. Exit \n")
         if (menu_choice == 1):
             current_status_message = add_status(current_status_message)
             print "your next status message is update:- " + current_status_message
@@ -137,13 +162,16 @@ def start_chat(spy_name,spy_age, spy_rating,spy_is_online):     #function create
             send_message()
         elif (menu_choice == 4):
             read_message()
+        elif(menu_choice == 5):
+            chat_history()
         elif (menu_choice == 0):
             menu_list = False
         else:
             print "invalid number press "
 
 
-spy_exist = raw_input("Do you want to continue " + spy.salutation + " " + spy.name + " (Y/N)? ")      #already existing user.
+spy_exist = raw_input("Do you want to continue " + spy.salutation + " " + spy.name + " (Y/N)? ")   #already existing user.
+
 if spy_exist.upper() == 'Y':
     print "you are already existing %s your age %d your rating %f"%(spy.name,spy.age,spy.rating)
     start_chat(spy.name,spy.age,spy.rating,spy.is_online)
