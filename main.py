@@ -1,4 +1,4 @@
-from details import spy, Spy, ChatMessage, friends   #import details.py file to maintain spy details.
+from details import spy, Spy,ChatMessage #import details.py file to maintain spy details.
 from steganography.steganography import Steganography   #using steganography encoding and decoding the text with the help of images.
 import csv  #importing csv file.
 from termcolor import colored       #to using colorfull output.
@@ -9,26 +9,29 @@ print (colored("let's get started","green"))
 
 status_message = ["hello guys", "i'm busy","only call don't text me " "i'm busy"]   #predefine status messages.
 direct=['emergency','accedent','sos','help','save','save me']
-
+friends=[]
+new_chat = []
 def load_friends():
-    with open('friends.csv', 'rb') as friends_data:
-        reader = csv.reader(friends_data)
-
-        for row in reader:
-            spy = Spy(name=row[0], rating=float(row[2]), age=int(row[3]))
-            friends.append(spy)
-
-
-
+    with open('friends.csv', 'rU') as friends_data:
+        reader = list(csv.reader(friends_data,dialect='excel'))
+        for row in reader[1:]:
+            if row:
+                name = row[0]
+                age = row[1]
+                rating = row[2]
+                online = row[3]
+                spy = Spy(name, age, rating, online)
+                friends.append(spy)
+load_friends()
 
 
 def add_status(current_status_message):     #create function to create a status messages.
     updated_status = None
     if current_status_message != None:      #check the condition of status messages.
-        print "your current status message is " + current_status_message
+        print colored("your current status message is ","blue") + current_status_message
     else:
-        print "you don't have any current status message"
-    default = raw_input("do you want old status(y/n)")
+        print colored("you don't have any current status message","blue")
+    default = raw_input(colored("do you want old status(y/n)","blue"))
     if default.upper() == "N":      #upper() is use to convert case sensitive.
         new_status = raw_input("what is your next status")
         if len(new_status)>0:
@@ -95,9 +98,9 @@ def send_message():     #function create to send a message to friend.
     Steganography.encode(original_image, output_path, text)    #incoding the text message with the help of images.
 
     new_chat = ChatMessage(text, True)
-    with open('chat.csv', 'a') as chat_data:
+    with open('chats.csv', 'a') as chat_data:
         writer = csv.writer(chat_data)
-        writer.writerow([friends[user_selected_friend].name , new_chat.message])
+        writer.writerow([friends[spy.name,user_selected_friend].name ,new_chat.message,new_chat.time])
     friends[user_selected_friend].chats.append(new_chat)     #append a new chat in status messages.
     print "Your secret message is ready! "
 
@@ -151,7 +154,7 @@ def start_chat(spy_name,spy_age, spy_rating,spy_is_online):     #function create
     current_status_message = None
     menu_list = True
     while menu_list:        #while loop is use to show the menu list
-        menu_choice = input("What do you want to do? \n 1. Add a status update\n 2. Add a friend \n 3. Send a message \n 4. Read a message \n 5. Chat History \n 0. Exit \n")
+        menu_choice = input(colored("What do you want to do? \n 1. Add a status update\n 2. Add a friend \n 3. Send a message \n 4. Read a message \n 5. Chat History \n 0. Exit \n","red"))
         if (menu_choice == 1):
             current_status_message = add_status(current_status_message)
             print "your next status message is update:- " + current_status_message
